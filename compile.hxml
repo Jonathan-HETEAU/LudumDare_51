@@ -1,4 +1,6 @@
 -cp src
 -lib heaps
+-lib deepnightLibs
+-lib ldtk-haxe-api
 -js out/js/TimeStick.js
 -main Main

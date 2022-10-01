@@ -1,6 +1,8 @@
 -cp src
 -lib heaps
---hl out/hl/TimeStick.hl
 -lib hlsdl
+-lib deepnightLibs
+-lib ldtk-haxe-api
+--hl out/hl/TimeStick.hl
 -main Main
 -debug

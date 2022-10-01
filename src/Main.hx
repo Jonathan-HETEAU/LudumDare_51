@@ -1,5 +1,4 @@
-import h3d.col.Collider;
-import h2d.col.RoundRect;
+import h2d.TileGroup;
 import h2d.Layers;
 import haxe.ds.List;
 import h2d.Object;
@@ -10,6 +9,7 @@ import hxd.Event;
 import hxd.Window;
 import h2d.Bitmap;
 import h2d.Tile;
+import LdtkProject;
 
 class Action {
 	public var right:Bool;
@@ -77,11 +77,11 @@ class Entity extends Object {
 		}
 		action = actions[tick];
 		if (setJump.exists(tick) && setJump[tick]) {
-			if(!onFloor){
-				if(doubleJump){
-					doubleJump= false;
-				}else{
-					return ;
+			if (!onFloor) {
+				if (doubleJump) {
+					doubleJump = false;
+				} else {
+					return;
 				}
 			}
 			velocity.y = -jumpForce;
@@ -140,21 +140,34 @@ class Main extends hxd.App {
 	var entity:Entity;
 	var entities:List<Entity> = new List<Entity>();
 	var plateformes:List<Platforme> = new List<Platforme>();
-
+	var map:Layer_Map;
 	var action:Action = new Action();
 	var jump:Bool = false;
+	var initPosition:Vector2D = new Vector2D();
 
 	override function init() {
 		hxd.Window.getInstance().title = "TimeStick";
 		s2d.addEventListener(onEvent);
+		var project = new LdtkProject();
+		map = project.all_levels.Level_0.l_Map;
 		initTimer();
 		initUI();
 		level = new Layers(s2d);
 		arena = new Layers(s2d);
-		entity = new Entity(s2d.width * 0.5, s2d.height * 0.5, arena);
-		plateformes.add(new Platforme(s2d.width * 0.25, s2d.height * 0.5, 64, 64, level));
-		plateformes.add(new Platforme(s2d.width * 0.75, s2d.height * 0.5, 64, 64, level));
-		plateformes.add(new Platforme(0, s2d.height * 0.5 + 70, s2d.width, 100, level));
+		s2d.scaleMode = ScaleMode.LetterBox(map.cWid * 64, 64 * map.cHei);
+		for (x in 0...map.cWid) {
+			for (y in 0...map.cHei) {
+				switch map.getInt(x, y) {
+					case 0:
+						initPosition = new Vector2D(x * 64, y * 64);
+					case 1:
+						plateformes.add(new Platforme(x * 64, y * 64, 64, 64, level));
+					case 2:
+					case _:
+				}
+			}
+		}
+		entity = new Entity(initPosition.x, initPosition.y, arena);
 	}
 
 	private function initTimer() {
