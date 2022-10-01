@@ -1,4 +1,4 @@
 -cp src
 -lib heaps
--js TimeStick.js
+-js out/js/TimeStick.js
 -main Main

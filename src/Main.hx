@@ -36,15 +36,20 @@ class Vector2D {
 }
 
 class Entity extends Object {
+	inline static var gravity = 9;
+	inline static var jumpForce = 80;
+	inline static var moveForce = 15;
+
 	var initPosition:Vector2D;
 	var bmp:Bitmap;
 	var actions:Array<Action> = new Array();
 	var setJump:Map<Int, Bool> = new Map();
-	var velocity:Vector2D;
+	var doubleJump:Bool;
+	var onFloor:Bool;
+
+	public var velocity:Vector2D;
 
 	public var action:Action;
-
-	var collider:RoundRect;
 
 	public function new(x:Float = 0, y:Float = 0, ?parent:Object) {
 		super(parent);
@@ -52,8 +57,9 @@ class Entity extends Object {
 		bmp = new Bitmap(tile, this);
 		this.initPosition = new Vector2D(x, y);
 		this.setPosition(x, y);
-		this.velocity = new Vector2D();
+		this.velocity = new Vector2D(moveForce, 0);
 		this.action = new Action();
+		this.doubleJump = true;
 		actions[0] = this.action;
 	}
 
@@ -70,6 +76,28 @@ class Entity extends Object {
 			tick--;
 		}
 		action = actions[tick];
+		if (setJump.exists(tick) && setJump[tick]) {
+			if(!onFloor){
+				if(doubleJump){
+					doubleJump= false;
+				}else{
+					return ;
+				}
+			}
+			velocity.y = -jumpForce;
+			onFloor = false;
+		}
+	}
+
+	public function update() {
+		if (action.left) {
+			x -= velocity.x;
+		}
+		if (action.right) {
+			x += velocity.x;
+		}
+		y += velocity.y + gravity;
+		velocity.y = Math.round(velocity.y / 2);
 	}
 
 	public function setGhost() {
@@ -78,6 +106,11 @@ class Entity extends Object {
 
 	public function restart():Void {
 		this.setPosition(initPosition.x, initPosition.y);
+	}
+
+	public function touchFloor() {
+		onFloor = true;
+		doubleJump = true;
 	}
 }
 
@@ -121,6 +154,7 @@ class Main extends hxd.App {
 		entity = new Entity(s2d.width * 0.5, s2d.height * 0.5, arena);
 		plateformes.add(new Platforme(s2d.width * 0.25, s2d.height * 0.5, 64, 64, level));
 		plateformes.add(new Platforme(s2d.width * 0.75, s2d.height * 0.5, 64, 64, level));
+		plateformes.add(new Platforme(0, s2d.height * 0.5 + 70, s2d.width, 100, level));
 	}
 
 	private function initTimer() {
@@ -170,11 +204,13 @@ class Main extends hxd.App {
 	function fixedUpdate(tick:Int) {
 		updateEntities(tick);
 		updateEntity(tick);
+		jump = false;
 	}
 
 	function updateEntities(tick:Int) {
 		for (entity in entities) {
 			entity.playAction(tick);
+			entity.update();
 			resolveAction(entity);
 		}
 	}
@@ -184,25 +220,39 @@ class Main extends hxd.App {
 		if (jump)
 			entity.saveJump(tick);
 		entity.playAction(tick);
+		entity.update();
 		resolveAction(entity);
 	}
 
 	function resolveAction(entity:Entity) {
-		if (entity.action.left) {
-			entity.x -= 20;
-		}
-		if (entity.action.right) {
-			entity.x += 20;
-		}
 		for (plateforme in plateformes) {
 			var eBounds = entity.getBounds();
 			var bounds = plateforme.getBounds();
-			var boundsInterseption = eBounds.intersection(bounds);
-			trace("inter " + boundsInterseption.x + ":" + boundsInterseption.width + " entity" + eBounds);
-			if (entity.x < plateforme.x) {
-				entity.x -= boundsInterseption.width;
-			} else {
-				entity.x += boundsInterseption.width;
+
+			if (eBounds.intersects(bounds)) {
+				var boundsInterseption = bounds.intersection(eBounds);
+				entity.touchFloor();
+				trace("intersect!!");
+				trace("entity:" + eBounds);
+				trace("plateforme:" + bounds);
+				trace("boundsInterseption" + boundsInterseption);
+				trace("width:" + boundsInterseption.width);
+				trace("height:" + boundsInterseption.height);
+
+				if (boundsInterseption.width >= boundsInterseption.height) {
+					if (entity.y < plateforme.y) {
+						entity.y -= boundsInterseption.height;
+					} else {
+						entity.y += boundsInterseption.height;
+					}
+				}
+				if (boundsInterseption.width <= boundsInterseption.height) {
+					if (entity.x < plateforme.x) {
+						entity.x -= boundsInterseption.width;
+					} else {
+						entity.x += boundsInterseption.width;
+					}
+				}
 			}
 		}
 	}
@@ -229,6 +279,7 @@ class Main extends hxd.App {
 					case hxd.Key.LEFT:
 						action.left = true;
 					case hxd.Key.UP:
+						jump = true;
 					case _:
 				}
 			case _:
