@@ -1,0 +1,17 @@
+{
+	"version": "0.2.0",
+	"configurations": [
+		{
+			"type": "hl",
+			"request": "launch",
+			"name": "HashLink",
+			"cwd": "${workspaceFolder}",
+			"preLaunchTask": "Build",
+			"args": [
+				{
+					"hotReload": "true"
+				}
+			]
+		}
+	]
+}

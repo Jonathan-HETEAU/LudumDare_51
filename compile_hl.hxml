@@ -1,0 +1,6 @@
+-cp src
+-lib heaps
+--hl out/hl/TimeStick.hl
+-lib hlsdl
+-main Main
+-debug
