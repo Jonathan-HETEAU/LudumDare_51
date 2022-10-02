@@ -5,7 +5,11 @@ class Input {
 	public var jump:Bool = false;
 	public var play:Bool = false;
 
-	public function new() {}
+	var gameManager:GameManager;
+
+	public function new(gameManager:GameManager) {
+		this.gameManager = gameManager;
+	}
 
 	
 
@@ -32,7 +36,8 @@ class Input {
 						action.left = true;
 					case hxd.Key.UP:
 						jump = true;
-					case _:
+					case hxd.Key.ESCAPE:
+						gameManager.menu();
 				}
 			case _:
 		}

@@ -6,7 +6,7 @@ class LevelManager {
 
 	public function new(niv:Int = 0) {
 		ldtkProject = new LdtkProject();
-		this.niv = 0;
+		this.niv = niv;
 	}
 
 	public function getLevel():LdtkProject_Level {
@@ -22,7 +22,7 @@ class LevelManager {
 	}
 
 	public function hasNextLevel():Bool {
-		return niv < ldtkProject.levels.length;
+		return niv + 1 < ldtkProject.levels.length;
 	}
 
 	public function restart() {

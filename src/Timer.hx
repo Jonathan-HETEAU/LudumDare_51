@@ -27,6 +27,6 @@ class Timer {
 	}
 
 	public function toString():String {
-		return "time:"+time+"|tick:"+tick;
+		return ""+Math.round(time);
 	}
 }

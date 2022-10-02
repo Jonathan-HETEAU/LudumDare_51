@@ -156,6 +156,7 @@ class Game extends Scene {
 	var input:Input;
 	var level:LdtkProject_Level;
 
+	var content:Object;
 	var start:Vector2D;
 	var end:Bitmap;
 	var layersUI:Layers;
@@ -179,7 +180,7 @@ class Game extends Scene {
 		super();
 		this.gManager = gManager;
 		this.level = level;
-		this.input = new Input();
+		this.input = new Input(gManager);
 		this.addEventListener(input.onEvent);
 		this.scaleMode = ScaleMode.LetterBox(level.pxWid, level.pxHei);
 		init();
@@ -189,13 +190,14 @@ class Game extends Scene {
 	function initFilter(){
 		var g = new h2d.filter.Glow(0x48FF00, 50, 2);
 		g.knockout = true;
-		this.filter = new h2d.filter.Group([g, new h2d.filter.Blur(3), new h2d.filter.DropShadow(8, Math.PI / 4)]);
+		content.filter = new h2d.filter.Group([g, new h2d.filter.Blur(3), new h2d.filter.DropShadow(8, Math.PI / 4)]);
 	}
 
 	function init() {
-		layersLevel = new Layers(this);
-		layersEntity = new Layers(this);
+		content = new Object(this);
 		layersUI = new Layers(this);
+		layersLevel = new Layers(content);
+		layersEntity = new Layers(content);
 		initTimer();
 		initMap(level.l_Map);
 		initActivable(level.l_AcctivablePlateforme);
@@ -212,7 +214,8 @@ class Game extends Scene {
 
 	private function initUI() {
 		timeText = new Text(DefaultFont.get(), layersUI);
-		timeText.x = this.width * 0.5;
+		timeText.y = -timeText.textHeight;
+		timeText.scale(10);
 	}
 
 	
@@ -277,8 +280,12 @@ class Game extends Scene {
 					fixedUpdate(tick);
 				}
 			}
+			timeText.text = "";
+			
+		}else{
+			timeText.text = "PAUSE";
+			timeText.x = (width  * 0.5) - timeText.calcTextWidth(timeText.text) * 5;
 		}
-		timeText.text = timer.toString();
 	}
 
 	function onTen() {
@@ -364,11 +371,11 @@ class Game extends Scene {
 		var bounds = end.getBounds();
 		for (entity in entities) {
 			if(bounds.intersects(entity.getBounds())){
-				gManager.restart();
+				gManager.nextLevel();
 			}
 		}
 		if(bounds.intersects(entity.getBounds())){
-			gManager.restart();
+			gManager.nextLevel();
 		}
 	}
 
