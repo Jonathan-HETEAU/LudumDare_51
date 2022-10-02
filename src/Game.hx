@@ -33,7 +33,7 @@ interface Activable {
 
 class MovingPlateforme extends Bitmap implements Activable {
 	var path:Array<Point>;
-	var indexPath:Int;
+	var indexPath:Int=0;
 	var initPosition:Vector2D;
 	var initState:Bool;
 	var currentState:Bool;
@@ -57,9 +57,20 @@ class MovingPlateforme extends Bitmap implements Activable {
 		if (currentState) {
 			updateDistance(speed);
 		}
+		
+	}
+
+	function recadreIndexPath(){
+		if(indexPath>= path.length){
+			indexPath = path.length -1 ;
+		}
+		if(indexPath< 0){
+			indexPath = 0;
+		}
 	}
 
 	function updateDistance(speed:Float) {
+		recadreIndexPath();
 		var nextPoint:Point = path[indexPath];
 		var distance = Math.abs(getBounds().getMin().distance(nextPoint));
 		if (distance <= speed) {
