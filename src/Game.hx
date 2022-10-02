@@ -17,6 +17,7 @@ class ButtonLevel extends Bitmap {
 
 	public function new(button:Entity_Button,cSize:Int,target:Activable,?parent:Object) {
 		super(Tile.fromColor(0xFF0000,button.width,button.height),parent);
+		this.alpha = 0.6;
 		setPosition(button.pixelX,button.pixelY);		
 		this.target = target;
 	}
@@ -41,7 +42,8 @@ class MovingPlateforme extends Bitmap implements Activable {
 	var speed:Int;
 
 	public function new(item:Entity_MovingPlateform, cSize:Int, ?parent:Object) {
-		super(Tile.fromColor(0xFF00FF, item.width, item.height), parent);
+		super(Tile.fromColor(0x3808FA, item.width, item.height), parent);
+		this.alpha = 0.5;
 		initPosition = new Vector2D(item.pixelX, item.pixelY);
 		setPosition(initPosition.x, initPosition.y);
 		this.currentState = this.initState = item.f_initState;
@@ -115,8 +117,9 @@ class SwitchingPlateforme extends Bitmap implements Activable{
 	var currentState:Bool;
 
 	public function new(item:Entity_SwitchPlateform, ?parent:Object) {
-		super(Tile.fromColor(0xFFFFFF, item.width, item.height), parent);
+		super(Tile.fromColor(0x000000, item.width, item.height), parent);
 		initPosition = new Vector2D(item.pixelX, item.pixelY);
+		this.alpha = 1;
 		this.setPosition(initPosition.x, initPosition.y);
 		this.currentState = this.initState = item.f_initState;
 	}
@@ -133,7 +136,7 @@ class SwitchingPlateforme extends Bitmap implements Activable{
 		if (currentState) {
 			this.alpha = 1;
 		} else {
-			this.alpha = 0.5;
+			this.alpha = 0.2;
 		}
 	}
 
@@ -180,6 +183,13 @@ class Game extends Scene {
 		this.addEventListener(input.onEvent);
 		this.scaleMode = ScaleMode.LetterBox(level.pxWid, level.pxHei);
 		init();
+		initFilter();
+	}
+
+	function initFilter(){
+		var g = new h2d.filter.Glow(0x48FF00, 50, 2);
+		g.knockout = true;
+		this.filter = new h2d.filter.Group([g, new h2d.filter.Blur(3), new h2d.filter.DropShadow(8, Math.PI / 4)]);
 	}
 
 	function init() {
@@ -239,6 +249,7 @@ class Game extends Scene {
 						start = new Vector2D(x * level.gridSize, y * level.gridSize);
 					case "end":
 						end = new Bitmap(Tile.fromColor(level.getColorInt(x, y), level.gridSize, level.gridSize), layersLevel);
+						end.alpha = 0.1;
 						end.setPosition(x * level.gridSize, y * level.gridSize);
 					case _:
 				}

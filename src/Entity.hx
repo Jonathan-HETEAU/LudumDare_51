@@ -20,7 +20,8 @@ class Entity extends Object {
 
 	public function new(x:Float = 0, y:Float = 0, ?parent:Object) {
 		super(parent);
-		var tile = Tile.fromColor(0xFFFFFF, 64, 64);
+		var tile = Tile.fromColor(0xFFFFFFFF, 64, 64);
+		alpha = 0.7;
 		bmp = new Bitmap(tile, this);
 		this.initPosition = new Vector2D(x, y);
 		this.setPosition(x, y);
