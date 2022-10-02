@@ -1,11 +1,12 @@
-class Main extends hxd.App {
-	var gManager:LevelManager;
+class Main extends hxd.App implements GameManager {
+	var levelManager:LevelManager;
 	var game:Game;
 
 	override function init() {
 		hxd.Window.getInstance().title = "TimeStick";
-		gManager = new LevelManager();
-		game = new Game(gManager.getLevel());
+		levelManager = new LevelManager();
+		
+		game = new Game(levelManager.getLevel(),this);
 		setScene2D(game);
 	}
 
@@ -13,6 +14,21 @@ class Main extends hxd.App {
 		super.update(deltat);
 		game.update(deltat);
 	}
+
+	public function quit():Void {}
+
+	public function nextLevel():Void {
+		if(levelManager.hasNextLevel()){
+
+		}
+	}
+
+	public function restart():Void {
+		game = new Game(levelManager.getLevel(),this);
+		setScene2D(game);
+	}
+
+	public function menu():Void {}
 
 	static function main() {
 		hxd.Res.initEmbed();
